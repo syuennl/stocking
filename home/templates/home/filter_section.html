@@ -1,0 +1,15 @@
+<h2>Filter</h2>
+
+<h3>category</h3>
+{% if acc_type == 'adminn' %}
+    <h4>tba</h4>
+{% else %}
+    <!-- <h4>Materials</h4> -->
+    {% for category in m_categories %}
+        <a href="/">{{category.name}}</a><br>
+    {% empty %}
+        No category found.
+    {% endfor %}
+{% endif %}
+<h3>colour</h3>
+

@@ -1,0 +1,216 @@
+setup
+virtualenv (env name)
+(env name)\scripts\activate
+django-admin startproject (project name)
+- new app : python manage.py startapp xxx (new apps muz mention in settings.py) // django-admin startapp xxx
+ 
+
+- can have diff apps
+- each app has its own view (what users see tht is linked to a html file)
+- html is the template, main templates in directory folder, specific templates under each app
+- base_dir templates folder muz mention in settings.py
+- urls muz be config in each app & the main one
+- edit settings.py
+- register models in admin.py, make migrations and migrate
+- run by cin : python manage.py runserver 9000
+
+- urls > models > view > template
+
+
+stocking (main) ---------------- 
+  1. settings.py
+  - edit installed apps everytime new app created
+  - templates 
+      'DIRS': [
+              BASE_DIR / 'templates' #goes back to base directory to find templates folder
+          ]
+
+  2. urls.py
+  - from django.urls import path, include
+  - urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('home.urls')),                 --> include all urls frm home app
+    path('playground/', include('playground.urls')) --> any path starting w/ 'playground/'will go to playgrnd app
+                                                        eg. playground/hello/ = playground/ will b chopped off, hello/ will b passed to playgrnd app
+    path('room/', room)                             --> if the view funcs are created in urls.py directly, calling room func
+  ]
+
+
+home app ---------------- 
+  - have its own templates folder to store specific htmls
+  1. urls.py
+  - path('', views.home, name = "home")                      --> not calling home func in view.py but passing a ref
+    path('product/<str:pk>/', views.product, name="product") --> dynamic value: <data type (int, str, slug etc.) : variable name>/
+                                                             --> when calling this path in html: {% url 'product' product.id %}
+
+  2. views.py
+  - create variables :
+    rooms = [
+      {'id':1, 'name':'python'},
+      {'id':2, 'name':'c++'},
+      {'id':3, 'name':'html'},
+  ]
+
+- create views
+    def home(request):
+      # return HttpResponse('empty home page')              --> if using httpresponse
+      context = {'products':products} 
+      return render(request, 'home/home.html', context)     --> w/ context, base/ cuz template html under base, if under directory folder, juz home.html
+      # return render(request, 'home.html',{'products':products}) --> w/o context, specify template name & variables (parameter:attributes)
+
+    def product(request, pk) --> when url calls product, pk will b passed in
+
+        category_name = request.POST.get('category')
+        category, created = Category.objects.get_or_create(name=category_name) #will return obj (topic) or date/time (created)
+    --> when creating new category, if user entered bracelet = ald exist, return necklace(category), false(created)
+                                                    necklace = x exists, return necklace(category), true(created)
+
+    def addProduct():
+    ...
+    product = form.save(commit=False) # create a Product instance, but hasn't saved 
+            product.user = request.user # when using form.save(commit=False), x auto include values x part of form fields (e.g currently logged-in user)
+                                        # muz manually link **imp
+    
+    def updateProduct():
+    - knt use product = form.save(commit=False) !! --> creating new instance, will clone the product
+    - other than delete productmaterial logic, can try checking wif existing materials
+      (put below quantities_used = request.POST.getlist....)
+      submitted_materials = set(material_names)  # For tracking deletions
+            
+            # Get existing ProductMaterial objects
+            existing_product_materials = ProductMaterial.objects.filter(product=obj)
+            existing_material_names = {pm.material.name for pm in existing_product_materials}
+            
+            # Handle deletions - remove materials that weren't submitted
+            materials_to_delete = existing_material_names - submitted_materials
+            ProductMaterial.objects.filter(
+                product=obj,
+                material__name__in=materials_to_delete
+            ).delete()
+            
+            # Update or create materials
+            for material_name, quantity in zip(material_names, quantities_used):
+                if material_name and quantity:
+                    material = Material.objects.get(name=material_name)
+                    ProductMaterial.objects.update_or_create(
+                        product=obj,
+                        material=material,
+                        defaults={'quantity_used': quantity}
+                    )
+
+  3. models.py
+  - creating database thru classes
+  - aft creating, terminal: python manage.py makemigrations (the migrations folder will hv a new file)
+                    then : python manage.py migrate (make sure settings.py installed apps has 'django.contrib.sessions')
+
+  ** create empty migrations file 
+    python manage.py makemigrations home --empty --name (name_of_migration)
+
+  4. admin.py
+  - register your models (db) so it'll b shown in webpg
+  - web url /admin, will b directed to admin login
+  - create super user in terminal : python manage.py createsuperuser
+  - or create new normal user aft logging in admin pg
+  - inspect, application, cookies, will hv token and session. everytime u click something on d pg, django will check the session record to see if ure allowed to b thr
+
+
+htmls/templates ---------------- 
+  1. home.html
+  - {% extends 'main.html' %} --> include what is in main.html, and extend it by adding specialised stuff in here
+  - {% block content %}       --> tags
+    {% endblock content %}
+  - {% include 'xx/xx.html %} --> include html snippet
+    {% include 'meetups/includes/meetup-item.html' with title=meetup.title location=meetup.location %} 
+    can do this if the snippet is included in many htmls but variable meetup is not reused in each of them,
+    juz pass like "params", so can directly use as {{title}}/{{location}} in other htmls
+  - **{{}} = interpolation syntax to ouput content stored in a variable
+    <h5>{{product.id}} -- <a href="/product/{{product.id}}">{{product.name}}</a></h5>      --> pass variables, less dynamic if nid to chg product/ etc.
+    or                                                                             eg. if urls.py chg 'product/<str:pk>/' to 'product_page/<str:pk>/', as long as name remains, nonid to chg every file tht references product/, can cont use 'product'(name)
+    <a href="{% url 'product' product.id %}"> // <a href='{% url "product" product.id %}'> --> caution '/", 'product' is the name in path (home's urls.py)
+    * matches path: 'product/<str:pk>/'
+  - material.user.username --> material obj, user (attr in product class, fk to User class), username (attr in django built in user class)
+    product.category.name  --> product obj, category (attr in material, fk to P_category), name (attr in P_category)
+
+  2. navbar.html (reference to study room project)
+  - form sends a GET request to home URL w/ d search term entered by user
+    search term captured using name="q" in the input field.
+  - form submitted, browser redirects to URL http://127.0.0.1:8000/?q=search_term, 
+    where search_term is the value entered by the user.
+  - in home func (views.py), 
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    rooms = Room.objects.filter(topic__name__icontains=q)
+    --> retrieves 'q' frm url using 'get'
+    --> filters 'Room' objs based on 'q'
+    --> filtered rooms and topics passed to home.html
+  - in home.html
+    {% for room in rooms %}
+              <div>
+                  ...
+                  <span>@{{room.host.username}}</span>
+                  <h5>{{room.id}} -- <a href="{% url 'room' room.id %}">{{room.name}}</a></h5>
+                  <small>{{room.topic.name}}</small>
+    --> filtered rooms will b displayed
+
+  3. cancel buttons
+  - <a href="{{request.META.HTTP_REFERER}}">Cancel</a>
+
+  3. forms
+  - csrf token
+  - action="" means will b sent back to same pg -->
+    enctype = all form fields, including txt, checkboxes, files, will b sent to server properly -->
+    --> application/x-www-form-urlencoded (the default) -- for simple text data, like login forms or text fields
+    --> multipart/form-data -- for binary data (like images or PDFs) to be sent in addition to text
+    --> text/plain -- sends data as plain text w/o encoding, not recomme
+
+
+static/images ----------------
+** all {% static '...' %} is for django to dynamically insert the correct url when running
+  (this is django templating language)
+  will be parsed by django bfr they return as pure html to browser
+
+- image field, can set default
+- js linked in <head>, add defer, when running if latest js not loaded, ctrl + f5
+  <script defer src="{% static 'js/script.js' %}" --> adding defer: when parsing html, script will b fetched, when html finish parsing, script will excecute-->
+- {% load static %} in main.html
+- make a static folder in base_dir
+- STATIC_URL = '/static/'
+- MEDIA_URL = 'folder_name/' # URL path to serve media files
+- STATICFILES_DIRS = [ **musttt
+    BASE_DIR / 'static',
+]
+  # default: looks for static files in each app's static/ directory
+  # STATICFILES_DIRS:  define additional locations (like BASE_DIR / 'static') where Django should also look for static files
+- MEDIA_ROOT = BASE_DIR / 'static/folder_name'
+  # directory on ur server whr user-uploaded files (such as profile pictures) will b stored
+- in html, <img src={{xxx.picture.url}} --> muz include .url
+- in the main urls.py (not the app's url.py), 
+  from django.conf.urls.static import static #ltr on might nid to host on aws(?), more proper
+  from django.conf import settings
+  urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+  # go into settings, whenever media_url (/images/) is set, find pic in media_root (static/images file)
+- in views.py, if using --> form = MaterialForm(request.POST, request.FILES, instance=obj)
+                                                              request.FILES v imppp!!!!
+- def registerPage: 
+  Profile.objects.create(
+                user = user,
+                picture = 'user.png' #default profile pic, juz file name, MEDIA_URL will prefix this
+            )                 
+  this way default img will b assigned to the profile, it wont work automatically  
+
+1. urls -> call views, pass in pk
+2. get room obj frm models.py, render in html (pass in room)
+
+
+
+
+1. venv, activate
+2. startproject
+3. startapp
+4. settings.py installed apps
+5. urls.py for app and global project
+6. runserver
+
+7. templates folder in app
+8. create another folder (of app name) in the templates folder 
+  (all templates folder will be merged as one in background, so add app name to differentiate)
+  (if each app has own static folder, do the same)

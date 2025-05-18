@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+
+<div class="profile-container">
+    <div class="profile-pic">
+        <img src="{{profile.picture.url}}" alt="profile picture">
+    </div>
+
+    <div class="profile-details">
+        <h1>{{profile.name}}</h1>
+        <span>@ {{user.username}}</span>
+        <br>
+        <a href="{% url 'update-profile' %}">edit</a>
+    </div>
+    
+   
+</div>
+{% endblock content %}

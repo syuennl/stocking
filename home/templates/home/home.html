@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+{% if acc_type == 'adminn' %}
+
+    <div class="admin-home-container">
+        <div class="admin-material-section">
+            {% include 'home/material_section.html' %}
+        </div>
+
+        <div class="admin-product-section">
+            {% include 'home/product_section.html' %}
+        </div>
+    </div>
+
+
+{% else %}
+    <div class="user-home-container">
+        <div class="user-material-container">
+            {% include 'home/material_section.html' %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

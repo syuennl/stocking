@@ -1,0 +1,42 @@
+{% load static %}
+{% if acc_type == 'adminn' %} <!--admin products section in home page-->
+    {% include 'home/product_filter.html' %}
+
+    <div class="product-heading">
+        <h1>products</h1>
+        <button id="add-product-btn">+</button>
+    </div>
+{% endif %}
+
+<div class="all-products">
+    {% for product in products %}
+    <div class="product-card">
+        
+        <a href="{% url 'admin-product' product.id 'adminn' %}"><img src="{{product.picture.url}}" alt="product image"></a>
+        
+        <div class="bottom-row">
+            <div class="description">
+                <a href="{% url 'admin-product' product.id 'adminn' %}"><h3>{{product.name}}</h3></a>
+                <span>{{product.created|date:'d-m-Y'}}</span>
+            </div>
+
+            <div class="manage-product"> 
+                <button class="manage-btn">...</button>
+                <!-- {% if request.user == product.user %}
+                <a href="{% url 'delete' 'Product' product.id %}">delete</a>
+                {% endif %} -->
+                <!-- <span>by {{product.user}}</span> -->
+                <div class="manage-dropdown">
+                    <a href="{% url 'update-product' product.id %}">
+                        <img src="{% static 'images/edit.png' %}" alt="edit button">
+                    </a>
+                    <a href="{% url 'delete' 'Product' product.id %}">
+                        <img src="{% static 'images/delete.png' %}" alt="delete button">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    {% endfor %}
+</div>

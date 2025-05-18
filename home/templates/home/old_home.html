@@ -1,0 +1,61 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+    .admin-home-container{
+        display: grid;
+        grid-template-columns: 2fr 3fr 3fr;
+    }
+
+    .admin-product-container{
+        display: flex;
+        flex-direction: column; /*stack each product-item one after another vertically (i.e, from top to bottom)*/
+        gap: 20px; /*gap between product-items*/      
+    } 
+
+    .admin-material-container{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .user-home-container{
+        display: grid;
+        grid-template-columns: 1fr 5fr;
+    }
+    
+    .user-material-container{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas: 'headingArea headingArea headingArea';
+        gap:10px;
+    }
+</style>
+
+{% if acc_type == 'adminn' %}
+    <div class="admin-home-container">
+        <div>
+            {% include 'home/filter_section.html' %}
+        </div>
+
+        <div class="admin-product-container">
+            {% include 'home/product_section.html' %}
+        </div>
+
+        <div class="admin-material-container">
+            {% include 'home/material_section.html' %}
+        </div>
+    </div>
+{% else %}
+    <div class="user-home-container">
+        <div>
+            {% include 'home/filter_section.html' %}
+        </div>
+
+        <div class="user-material-container">
+            {% include 'home/material_section.html' %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

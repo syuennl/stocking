@@ -1,0 +1,67 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<script defer src="{% static 'js/profile.js' %}"></script>
+
+<form method="POST" action="" class="profile-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="update-profile-container">
+        <div class="profile-form-img">
+            <div class="profile-pic">
+                <img src="{{profile.picture.url}}" alt="profile picture">
+                <button id="uploadPfp-btn">
+                    <img src="{% static 'images/upload_img2.png' %}" alt="upload profile picture icon">
+                </button>
+            </div>
+                
+            <div class="new-pfp">
+                <input id="upload-pfp" type="file" accept="image/*" name="picture"> <!-- only image accepted -->
+            
+                <div class="current-img-name">
+                    <label>current image: </label>
+                    <input id="pfp-name" type="text" value="{{profile.picture.name}}" readonly>
+                </div>
+            
+                <label class="clear-pfp">
+                    <input type="checkbox" checked>
+                    clear image
+                </label>
+            
+                <span>.heic files are not suported :&#40;</span>
+            </div>
+        </div>
+
+        <div class="profile-form-details">
+            {% for field in profile_form %}
+            <div>
+                <label for="profile-form">{{field.label|lower}}</label> <br>
+                {{field}}
+            </div>
+            {% endfor %}
+
+            {% for field in user_form %}
+            <div>
+                <label for="user-form">{{field.label|lower}}</label> <br>
+                {{field}}
+            </div>
+            {% endfor %}
+
+            <label for="new-pswrd">new password</label> <br>
+            <input class="new-pswrd" type="password" name="password1">
+            <br>
+            <label for="confirm-new-pswrd">confirm new password</label> <br>
+            <input class="confirm-new-pswrd" type="password" name="password2">
+        </div>
+    </div>
+    
+    <!-- <a href="{{request.META.HTTP_REFERER}}">Cancel</a> -->
+    <div class="profile-form-btns">
+        <button id="cancel-btn" type="button">cancel</button>
+        <button id="update-btn" type="submit">update</button>
+    </div>
+    <!-- <input type="submit" value="update"> -->
+</form>
+
+
+{% endblock content %}

@@ -1,0 +1,176 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="view-material-content">
+    <div class="view-material">
+        <!------------------- heading ----------------------->
+        <div class="heading">
+            <h2>{{material.name}}</h2>
+
+            {% if acc_type == 'adminn' %} <!--admin materials page-->
+            <div>
+                <a href="{% url 'update-material' material.id %}">edit</a> <!--{% url 'update-material' material.id %}-->
+                <a href="{% url 'delete' 'Material' material.id %}">delete</a> <!--{% url 'delete' 'Material' material.id %}-->
+            </div>
+            {% endif %}
+        </div>
+
+        <span id="date">updated on {{material.updated|date:'d-m-Y'}}</span> <br><br>
+        <!--{{material.updated|timesince}}-->
+
+        <!------------------- material details ----------------------->
+        <div class="details">
+            <div class="material-img"> 
+                <img src="{{material.picture.url}}" alt="material image" /> <br>
+            </div>
+            
+            <!------------------- admin materials description ----------------------->
+            {% if acc_type == 'adminn' %} 
+            <div class="material-description">
+                {% for key, value in details.items %}
+                    <div class="description-box">
+                        {% if key == 'Stock' %} <!--stock-->
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <input id="stock" type="number" value="{{value}}" min="0" />
+                            </div>
+                        {% elif key == 'Description' %} <!--stock-->
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <textarea id="description" name="description" disabled>{{material.description}}</textarea>
+                            </div>
+                        {% else %}
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <h3>{{value}}</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+                <!-- <div class="keys">
+                    <h3>Name</h3>
+                    <h3>Size</h3>
+                    <h3>Stock</h3>
+                    <h3>Colour</h3>
+                    <h3>Cost</h3>
+                    <h3>Supplier</h3>
+                    <h3>Category</h3>
+                    <h3>Description</h3>
+                </div>
+
+                <div class="values">
+                    <h3>: {{material.name}}</h3>
+                    <h3>: {{material.size}}</h3>
+                    <div>
+                        <h3>:</h3>
+                        <input id="stock" type="number" value="{{material.stock}}" min="0" />
+                    </div>
+                    <h3>: {{material.colour}}</h3>
+                    <h3>: {{material.cost}}</h3>
+                    <h3>: {{material.supplier}}</h3>
+                    <h3>: {{material.category}}</h3>
+                    <div>
+                        <h3>:</h3>
+                        <textarea id="description" name="description" disabled>{{material.description}}</textarea>
+                    </div>
+                </div> -->
+
+                <!-- <ul>
+                    {% for key, value in details.items %} {% if key == 'stock' %}
+                    <li>
+                        {{key}}:
+                        <a href="{% url 'increase' 'material' material.id %}">+</a> {{value}}
+                        <a href="{% url 'decrease' 'material' material.id %}">-</a>
+                    </li>
+                    {% else %}
+                    <li>{{key}}: {{value}}</li>
+                    {% endif %} {% endfor %}
+                </ul> -->
+            <!-- </div> -->
+
+            {% else %}
+            <!------------------- user materials description ----------------------->
+            <div class="material-description"> 
+                {% for key, value in user_details.items %}
+                <div class="description-box">
+                    {% if key == 'Stock' %} <!--stock-->
+                        <h3 class="keys">{{key}}</h3>
+                        <div class="values">
+                            <h3>:</h3>
+                            <input id="stock" type="number" value="{{value}}" min="0" />
+                        </div>
+                    {% elif key == 'Description' %} <!--stock-->
+                        <h3 class="keys">{{key}}</h3>
+                        <div class="values">
+                            <h3>:</h3>
+                            <textarea id="description" name="description" disabled>{{material.description}}</textarea>
+                        </div>
+                    {% else %}
+                        <h3 class="keys">{{key}}</h3>
+                        <div class="values">
+                            <h3>:</h3>
+                            <h3>{{value}}</h3>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <!-- <div class="keys">
+                    <h3>Name</h3>
+                    <h3>Size</h3>
+                    <h3>Stock</h3>
+                    <h3>Colour</h3>
+                    <h3>Category</h3>
+                    <h3>Description</h3>
+                </div>
+
+                <div class="values">
+                    <h3>: {{material.name}}</h3>
+                    <h3>: {{material.size}}</h3>
+                    <h3>: {{material.stock}}</h3>
+                    <h3>: {{material.colour}}</h3>
+                    <h3>: {{material.category}}</h3>
+                    <div>
+                        <h3>:</h3>
+                        <textarea name="description" id="description" disabled>this is a description</textarea>
+                    </div>
+                </div> -->
+            </div>
+
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!------------------- related products ----------------------->
+    <div class="related-products"> 
+        <h2>Related products</h2>
+
+        {% for product in related_products %}
+        <div class="related-p">
+            <img src="{{product.picture.url}}" alt="related products image">
+
+            {% if acc_type == 'adminn' %}
+            <a href="{% url 'admin-product' product.id 'adminn' %}">{{product.name}}</a>
+            {% else %}
+            <a href="{% url 'product' product.id %}">{{product.name}}</a>
+            {% endif %}
+
+            <!-- <a href="">
+                <h3>product 2</h3>
+            </a> -->
+        </div>
+
+        {% empty %}
+        No related products found.
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

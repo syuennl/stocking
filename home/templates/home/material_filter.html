@@ -1,0 +1,43 @@
+{% load static %}
+<div class="material-filters">
+    <form action="" method="GET" id="material-filter-form">
+    <table class="material-filter-table">
+        <tbody>
+        <tr>
+            <td id="material-filter-tag"><img src="{% static 'images/filter.png' %}" alt="filter icon"></td>
+
+            <td>
+            <select class="m-category-filter" name="mcat">
+                <option value="" selected>All categories</option>
+                {% for m_category in m_categories %}
+                    <option value="{{ m_category.name }}">{{m_category}}</option>
+                {% endfor %}
+            </select>
+            </td>
+
+            <td>
+            <select class="colour-filter" name="col">
+                <option value="" selected>All colours</option>
+                {% for colour in all_colours %}
+                    <option value="{{ colour.name }}">{{colour}}</option>
+                {% endfor %}
+            </select>
+            </td>
+
+            <td>
+            <select class="supplier-filter" name="supp">
+                <option value="" selected>All suppliers</option>
+                {% for supplier in all_suppliers %}
+                    <option value="{{ supplier.name }}">{{supplier}}</option>
+                {% endfor %}
+            </select>
+            </td>
+
+            <td>
+            <input class="reset" type="reset" value="Reset" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </form>
+</div>

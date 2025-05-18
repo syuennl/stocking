@@ -1,0 +1,32 @@
+{% load static %}
+<div class="navbar">
+    <div id="logo">
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <a href="{% url 'admin-home' 'adminn' %}"><img src="{% static 'images/logo.png' %}" alt="logo"></a> 
+        {% else %}
+            <a href="{% url 'home' %}">logo</a> 
+        {% endif %}
+        <!-- <img src="images/logo.png" alt="logo"> -->
+    </div>
+
+    {% if request.user.is_authenticated %}
+        <h1 id="welcome-msg">Hello, {{request.user.username}}</h1>
+    {% else %}
+        <a href="{% url 'login' %}">login</a>
+    {% endif %}
+    <!-- <h1 id="welcome-msg">Hello, {{request.user.username}}</h1> -->
+
+    <div class="taskbar">
+        <button id="dash-btn"><h3>dashboard</h3></button>
+        <button id="orders-btn"><h3>orders</h3></button>
+        <button id="filter-btn"><h3>filter</h3></button>
+        <button id="search-btn"><h3>🔍︎</h3></button>
+        <!-- <div id="search">
+            <button id="search-btn"><img src="images/search.png" alt="search icon"></button>
+        </div> -->
+    </div>
+
+    <div id="profile">
+        <a href="{% url 'profile' user.id %}"><img src="{{profile.picture.url}}" alt="user profile"></a>
+    </div>
+</div>

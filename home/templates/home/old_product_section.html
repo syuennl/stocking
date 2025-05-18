@@ -1,0 +1,41 @@
+<style>
+    .product-item{
+        display: flex; /*no flex-direction, pic & details aligned side by side*/
+        gap: 20px; /*gap between pic & details*/
+        align-items: center;
+    }
+
+    .product-pic img{
+        width: 80px;
+        height: 80px;
+        object-fit: cover; /*lock pic aspect ratio*/
+    }
+</style>
+
+
+<h1>products</h1> 
+{% if acc_type == 'adminn' %} 
+    <a href="{% url 'add-product' %}">add</a>
+    <!-- <p>Add Product URL: {% url 'add-product' %}</p> -->
+    <hr>
+{% endif %}
+
+{% for product in products %}
+<div class="product-item">
+    <div class="product-pic">
+        <img src="{{product.picture.url}}" />
+    </div>
+
+    <div class="product-details">
+        <a href="{% url 'admin-product' product.id 'adminn' %}">{{product.name}}</a>
+        {% if request.user == product.user %}
+            <a href="{% url 'delete' 'Product' product.id %}">delete</a>
+        {% endif %}
+        <br>
+        <span>{{product.created|timesince}} ago</span>
+        <br>
+        <span>by {{product.user}}</span>
+    </div>
+    
+</div>
+{% endfor %}

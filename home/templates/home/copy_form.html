@@ -1,0 +1,178 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<div class="add-content">
+    <div class="add-material"> <!--???class name items?-->
+        <div class="heading">
+            <h1>{{title}}</h1>
+        </div>
+
+        <div class="details">
+            <div class="material-img">
+                <img src="{{obj.picture.url}}" alt="material image"> <br>
+            </div>
+
+            <div class="material-description">
+                <form method="POST" action="" enctype="multipart/form-data"
+                    onsubmit="document.getElementById('submitBtn').disabled = true;">
+                    <!-- enctype = multipart/form-data -- encoding method if form includes file uploads (e.g img/PDFs), form fields, including txt, checkboxes, files, will b sent to server properly -->
+                    <!-- action="" --  specifies where to send the form-data when a form is submitted, "" means will b sent back to same pg -->
+
+                    {% csrf_token %}
+                    <!-- {{form.as_p}}  -->
+
+                    <div class="keys">
+                        {% for field in form %}
+                        {% if field.label == 'Colour' %}
+                        <h3>Colour</h3>
+
+                        <!-------------------------- for materials only ----------------------->
+                        {% elif field.label == 'Supplier' %}
+                        <h3>Supplier</h3>
+
+                        {% elif field.label == 'Category' %}
+                        <h3>Category</h3>
+
+                        {% else %}
+                        <h3 for="form">{{field.label}}</h3>
+
+                        {% endif %}
+                        {% endfor %}
+
+                        <!-------------------------- for products only ----------------------->
+                        {% if materials %}
+                        <h3>Materials</h3>
+                        {% endif %}
+                    </div>
+
+                    <div class="values">
+                        {% for field in form %}
+                        {% if field.label == 'Colour' %}
+                        <div>
+                            <h3>: </h3>
+                            <input required type="text" value="{{obj.colour.name}}" name="colour" list="colour-list" />
+                            <!-- value = colour name -> only displayed when updating cuz product attr is passed into context oni in update, but not create -->
+                            <datalist id="colour-list">
+                                {% for colour in colours %}
+                                <option value="{{colour.name}}">{{colour.name}}</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+
+                        <!-------------------------- for materials only ----------------------->
+                        {% elif field.label == 'Supplier' %}
+                        <div>
+                            <h3>: </h3>
+                            <input type="text" value="{{obj.supplier.name}}" name="supplier" list="supplier-list" />
+                            <datalist id="supplier-list">
+                                <select id="obj-supplier">
+                                    {% for supplier in suppliers %}
+                                    <option value="{{supplier.name}}">{{supplier.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </datalist>
+                        </div>
+                        <!---------------------------------------------------------------------->
+
+                        {% elif field.label == 'Category' %}
+                        <div>
+                            <h3>: </h3>
+                            <input required type="text" value="{{obj.category.name}}" name="category"
+                                list="category-list" />
+                            <!-- value = category name -> only displayed when updating cuz product attr is passed into context oni in update, but not create -->
+                            <datalist id="category-list">
+                                {% for category in categories %}
+                                <option value="{{category.name}}">{{category.name}}</option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+
+                        {% else %}
+                        <div>
+                            <h3>: </h3>
+                            {{field}}
+                        </div>
+
+                        {% endif %}
+                        {% endfor %}
+
+                        <!-------------------------- for products only ----------------------->
+                        {% if materials %}
+                        <div id="productmaterial-container">
+
+                            {% if productMaterial %} <!--for update-->
+                            {% for productmaterial in productMaterial %} <!--display multiple material boxes-->
+                            <div class="productmaterial-box">
+
+                                <!--material name-->
+                                <select name="productmaterial">
+                                    <option disabled hidden>select material</option> <!--what for???-->
+                                    {% for material in materials %}
+                                    <!--all materials will be displayed as dropdown box-->
+                                    {% if productmaterial.material.name == material.name %}
+                                    <!--decides which option is selected in the current box-->
+                                    <option value="{{productmaterial.material.name}}" selected>
+                                        {{productmaterial.material.name}}</option>
+                                    {% else %}
+                                    <option value="{{material.name}}">{{material.name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                                <!--material quantity-->
+                                <input type="number" value="{{productmaterial.quantity_used}}" name="quantities_used"
+                                    min="1" />
+                                <!--value="{{obj.material.quantity_used.id}}"-->
+
+                                <button class="deleteBtn">-</button>
+                            </div>
+                            {% endfor %}
+
+                            {% else %} <!--for add-->
+                            <div class="productmaterial-box">
+
+                                <!-- material name-->
+                                <select name="productmaterial">
+                                    <option value="" disabled hidden selected>select material</option>
+                                    {% for material in materials %}
+                                    <option value="{{material.name}}">{{material.name}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <!--material quantity-->
+                                <input type="number" value="{{productmaterial.quantity_used}}" name="quantities_used"
+                                    min="0" />
+
+                                <button class="deleteBtn">-</button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- <datalist id="material-list">
+                                            {% for material in materials %}
+                                            <option value="{{material.name}}">{{material.name}}</option>
+                                            {% endfor %}
+                                            </datalist>  -->
+
+                        <button type="button" id="addMaterialBtn">+</button>
+
+                        {% endif %}
+                        <!---------------------------------------------------------------------->
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!--buttons-->
+        <div class="buttons">
+            <button>cancel</button>
+            <button type="submit" id="save">save</button>
+        </div>
+
+        <!-- <button type="submit" name="submitBtn">Submit</button> -->
+        <!-- <a href="{{request.META.HTTP_REFERER}}">Cancel</a> -->
+    </div>
+</div>
+
+{% endblock content %}

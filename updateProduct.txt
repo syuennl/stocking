@@ -1,0 +1,92 @@
+def updateProduct(request, pk):
+    obj = Product.objects.get(id=pk)
+    obj_type = "product"
+    form = ProductForm(instance=obj)
+    title = 'update ' + obj.name
+    
+    categories = P_Category.objects.all()
+    materials = Material.objects.all()
+    productMaterial = ProductMaterial.objects.filter(product=obj) # "get" oni returns 1 obj, "filter" returns >=1
+
+    if request.method == 'POST':
+        # form = ProductForm(request.POST, request.FILES, instance=obj) 
+
+        # category
+        category_name = request.POST.get('category')
+        P_Category.objects.get_or_create(name=category_name)
+
+        # modify category by replacing charfield with foreign key to category obj
+        # prevent error during form.is_valid
+        # updatedForm = request.POST.copy()
+        # updatedForm.update({'category':category})
+        form = ProductForm(request.POST, request.FILES, instance=obj)
+
+        if form.is_valid():
+        #     form.save()
+
+            # materials
+            material_names = request.POST.getlist('productmaterial')
+            quantities_used = request.POST.getlist('quantities_used')
+            # print("materials : ", material_names)
+            # print("quantities used: ", quantities_used)
+
+            has_error = False
+            valid_materials = []
+            
+            for material_name, quantity in zip(material_names, quantities_used):
+                if material_name and quantity: # ensure not null values
+                    try:
+                        material = Material.objects.get(name=material_name) #ensure material obj exist
+                        quantity = int(quantity) 
+                        
+                        #ensure quantity > 1
+                        if quantity < 1:
+                            messages.error(request, f'Quantity for {material.name} must be at least 1')
+                            has_error = True
+                        else:
+                            valid_materials.append((material,quantity))
+                        
+                    except Material.DoesNotExist:
+                        messages.error(request, f'{material_name} does not exist')
+                        has_error = True
+                else:
+                    if material_name:
+                        messages.error(request, f'Please insert quantity for {material_name}')
+                        has_error = True
+                    elif quantity:
+                        messages.error(request, f'Please select a material for the provided quantity')
+                        has_error = True
+            
+            if not has_error:
+                # delete existing materials, replace wif new ones
+                ProductMaterial.objects.filter(product=obj).delete()
+                for material, quantity in valid_materials:
+                    ProductMaterial.objects.create(
+                                material=material,
+                                product=obj,
+                                quantity_used=quantity
+                            )
+
+                if 'picture' in request.FILES:
+                    print(request.FILES['picture'])
+                    obj.picture = request.FILES['picture']
+
+                obj.name = request.POST.get('name')
+                obj.size = request.POST.get('size')
+                obj.stock = request.POST.get('stock')
+                obj.sold = request.POST.get('sold')
+                obj.cost = request.POST.get('cost')
+                obj.category = request.POST.get('category')
+                obj.description = request.POST.get('description')
+
+                
+
+                obj.save()
+                acc_type = 'adminn'
+                return redirect ('admin-product', pk, acc_type)
+        else:
+            print(form.errors)
+    
+    
+    context = {'form':form, 'obj':obj, 'obj_type':obj_type, 'categories':categories, 'materials':materials, 'productMaterial':productMaterial, 'title': title}
+    return render(request, 'home/form.html', context)

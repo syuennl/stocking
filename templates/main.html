@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>stocking</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' href="{% static 'style/style.css' %}">
+    <script defer src="{% static 'js/home.js' %}" ></script> <!--adding defer: when parsing html, script will b fetched, when html finish parsing, script will excecute-->
+</head>
+
+<body>
+    {% include 'navbar.html' %}   
+
+    {% if messages %}
+    <!-- if msgs is true (got msgs to display) -->
+     <ul class = "messages">
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+     </ul>
+    {% endif %}
+    
+    <div class="content">
+        {% include 'column_bar.html' %}
+
+        {% block content %}
+
+        {% endblock %}
+    </div>
+    
+</body>
+
+</html>

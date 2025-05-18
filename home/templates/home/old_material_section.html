@@ -1,0 +1,73 @@
+<style>
+  .admin-material-item {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .admin-material-pic {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+
+  .user-material-item {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .admin-material-pic {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+
+  .user-heading{
+        grid-area: headingArea;
+  }
+</style>
+
+
+{% if acc_type == 'adminn' %} <!--admin materials section in home page-->
+  <h1>materials</h1>
+  <a href="{% url 'add-material' %}">add</a>
+  <!-- <p>Add Material URL: {% url 'add-material' %}</p> -->
+  <hr />
+
+  {% for material in materials %} 
+  <div class="admin-material-item">
+    <div class="admin-material-pic">
+      <img src="{{material.picture.url}}" width="80" height="80" />
+      <!--w/o url will direct to img pg, so muz hv-->
+    </div>
+
+    <div class="admin-material-details">
+      <a href="{% url 'admin-material' material.id 'adminn' %}">{{material.name}}</a>
+      {% if request.user == material.user %}
+      <a href="{% url 'delete' 'Material' material.id %}">delete</a>
+      {% endif %}
+      <br />
+      <span>{{material.created|timesince}} ago</span>
+      <br>
+      <span>by {{material.user}}</span>
+    </div>
+  </div>
+  {% endfor %}
+
+{% else %} <!--user materials section in home page-->
+  <h1 class="user-heading">materials</h1>
+
+  {% for material in materials %} 
+  <div class="user-material-item">
+    <div class="user-material-pic">
+      <img src="{{material.picture.url}}" width="80" height="80" />
+    </div>
+
+    <div class="user-material-details">
+      <a href="{% url 'material' material.id %}">{{material.name}}</a>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+

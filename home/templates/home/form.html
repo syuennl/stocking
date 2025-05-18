@@ -1,0 +1,234 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<script defer src="{% static 'js/form.js' %}"></script>
+
+<div class="form-content">
+    <div class="form-obj"> <!--???class name items?-->
+        <div class="heading">
+            <h1>{{title}}</h1>
+        </div>
+
+        
+        <form method="POST" action="" enctype="multipart/form-data"
+        onsubmit="document.getElementById('save-btn').disabled = true;">
+        <!-- enctype = multipart/form-data -- encoding method if form includes file uploads (e.g img/PDFs), form fields, including txt, checkboxes, files, will b sent to server properly -->
+        <!-- action="" --  specifies where to send the form-data when a form is submitted, "" means will b sent back to same pg -->
+        
+            {% csrf_token %}
+            <div class="obj-img-container">
+                <div class="obj-img">
+                    {% if obj %} <!--update form-->
+                        <img src="{{obj.picture.url}}" alt="{{obj_type}} image">
+                    {% else %}
+                        {% if obj_type == "material" %} <!--add form-->
+                            <img src="{% static 'images/material_empty.jpeg' %}" alt="new material default image">
+                        {% elif obj_type == "product" %} <!--add form-->
+                            <img src="{% static 'images/product_empty.jpeg' %}" alt="new product default image">
+                        {% endif %}
+                    {% endif %}
+                
+                    <button id="uploadImg-btn" type="button">
+                        <img src="{% static 'images/upload_img.png' %}" alt="upload image icon">
+                    </button>
+                </div>
+
+                <br>
+
+                <div class="new-img">
+                    <input id="upload-img" type="file" accept="image/*" name="picture"> <!-- only image accepted -->
+
+                    <div>
+                        <label>current image: </label>
+                        <input id="img-name" type="text" value="{{obj.picture.name}}" readonly>
+                    </div>
+
+                    <label class="clear-img">
+                        <input type="checkbox" checked>
+                        clear image
+                    </label>
+
+                    <span>.heic files are not suported :&#40;</span>
+                </div>
+            </div>
+
+            
+            <div class="obj-description-container">
+                <!-- {{form.as_p}}  -->
+                <div class="obj-description">
+                    {% for field in form %}
+                        {% if field.label == 'Colour' %}
+                            <div class="description-box">
+                                <h3 class="keys">Colour</h3>
+                                <div class="values">
+                                    <h3>: </h3>
+                                    <input required type="text" value="{{obj.colour.name}}" name="colour" list="colour-list" />
+                                    <!-- value = colour name -> only displayed when updating cuz product attr is passed into context oni in update, but not create -->
+                                    <datalist id="colour-list">
+                                        {% for colour in colours %}
+                                        <option value="{{colour.name}}">{{colour.name}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+
+                        <!-------------------------- for materials only ----------------------->
+                        {% elif field.label == 'Supplier' %}
+                            <div class="description-box">
+                                <h3 class="keys">Supplier</h3>
+                                <div class="values">
+                                    <h3>: </h3>
+                                    <input required type="text" value="{{obj.supplier.name}}" name="supplier" list="supplier-list" />
+                                    <datalist id="supplier-list">
+                                        <select id="obj-supplier">
+                                            {% for supplier in suppliers %}
+                                            <option value="{{supplier.name}}">{{supplier.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </datalist>
+                                </div>
+                            </div>
+                        <!---------------------------------------------------------------------->
+                        
+                        {% elif field.label == 'Category' %}
+                            <div class="description-box">
+                                <h3 class="keys">Category</h3>
+                                <div class="values">
+                                    <h3>: </h3>
+                                    <input required type="text" value="{{obj.category.name}}" name="category" list="category-list" />
+                                    <!-- value = category name -> only displayed when updating cuz product attr is passed into context oni in update, but not create -->
+                                    <datalist id="category-list">
+                                        {% for category in categories %}
+                                        <option value="{{category.name}}">{{category.name}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+
+                        {% else %}
+                            <div class="description-box">
+                                <h3 class="keys">{{field.label}}</h3>
+                                <div class="values">                               
+                                    <h3>: </h3>
+                                    {{field}} <!--put required?-->
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-------------------------- for products only ----------------------->
+                    {% if materials %}
+                    <div class="description-box">
+                        <h3 class="keys">Materials</h3>
+                        <div class="productmaterial-values">
+                            <div>
+                                <h3>:</h3>
+                                <div class="productmaterial-container">
+                                
+                                    {% if productMaterial %} <!--for update-->
+                                        {% for productmaterial in productMaterial %} <!--display multiple material boxes-->
+                                        <div class="productmaterial-box">
+                                    
+                                            <!--material name-->
+                                            <select name="productmaterial">
+                                                <option disabled hidden>select material</option> <!--what for??? to display empty box?-->
+
+                                                {% for material in materials %} <!--all materials will be displayed as dropdown box-->
+                                                    {% if productmaterial.material.name == material.name %}
+                                                        <!--decides which option is selected in the current box-->
+                                                        <option value="{{productmaterial.material.name}}" selected>{{productmaterial.material.name}}</option>
+                                                    {% else %}
+                                                        <option value="{{material.name}}">{{material.name}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                    
+                                            <!--material quantity-->
+                                            <input type="number" value="{{productmaterial.quantity_used}}" name="quantities_used" min="1" />
+                                            <!--value="{{obj.material.quantity_used.id}}"-->
+                                    
+                                            <button class="delete-btn">-</button>
+                                        </div>
+                                        {% endfor %}
+                                
+                                    {% else %} <!--for add-->
+                                        <div class="productmaterial-box">
+                                    
+                                            <!-- material name-->
+                                            <select name="productmaterial">
+                                                <option value="" hidden selected>select material</option>
+                                                {% for material in materials %}
+                                                <option value="{{material.name}}">{{material.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                    
+                                            <!--material quantity-->
+                                            <input type="number" value="{{productmaterial.quantity_used}}" name="quantities_used" min="0" />
+                                    
+                                            <button class="delete-btn">-</button>
+                                        </div>
+                                    {% endif %}
+
+                                    <!--hidden box for cloning-->
+                                    <div class="empty-box" style="display: none;">
+                                    
+                                        <!-- material name-->
+                                        <select name="productmaterial">
+                                            <option value="" disabled hidden selected>select material</option>
+                                            {% for material in materials %}
+                                            <option value="{{material.name}}">{{material.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    
+                                        <!--material quantity-->
+                                        <input type="number" value="{{productmaterial.quantity_used}}" min="1" />
+                                    
+                                        <button class="delete-btn">-</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                             
+                            <button type="button" id="add-pm-btn">+</button>
+                        </div>
+                        
+                        <!-- <datalist id="material-list">
+                        {% for material in materials %}
+                        <option value="{{material.name}}">{{material.name}}</option>
+                        {% endfor %}
+                        </datalist>  -->
+                        
+                        <!-- <button type="button" id="addMaterialBtn">+</button> -->
+                    </div>
+                    
+                    {% endif %}          
+                    <!---------------------------------------------------------------------->
+                </div>
+
+                <!--buttons-->
+                <div class="buttons">
+                    {% if obj %}
+                        {% if obj_type == "material" %}
+                        <button id="cancel-btn" type="button" data-url="{% url 'admin-material' obj.id 'adminn' %}">cancel</button>
+                        {% elif obj_type == "product" %}
+                        <button id="cancel-btn" type="button" data-url="{% url 'admin-product' obj.id 'adminn' %}">cancel</button>
+                        {% endif %}
+                    {% else %}
+                    <button id="cancel-btn" type="button" data-url="{% url 'admin-home' 'adminn' %}">cancel</button>
+                    {% endif %}
+                
+                    <button id="save-btn" type="submit">save</button>
+                </div>
+                
+                <!-- <button type="submit" name="submitBtn">Submit</button> -->
+                <!-- <a href="{{request.META.HTTP_REFERER}}">Cancel</a> -->
+            </div>  
+        </form>
+        
+
+        
+    </div>
+</div>
+
+{% endblock content %}

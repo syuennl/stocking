@@ -1,0 +1,33 @@
+{% load static %}
+<div class="product-filters">
+    <form action="" method="GET" id="product-filter-form">
+    <table class="product-filter-table">
+        <tbody>
+        <tr>
+            <td id="product-filter-tag"><img src="{% static 'images/filter.png' %}" alt="filter icon"></td>
+
+            <td>
+            <select class="category-filter" name="pcat">
+                <option selected value="">All categories</option>
+                {% for p_category in p_categories %}
+                    <option value="{{p_category.name}}">{{p_category}}</option>
+                {% endfor %}
+            </select>
+            </td>
+
+            <!-- <td>
+            <select class="colour-filter" name="colour">
+                <option selected>All colours</option>
+                <option>red</option>
+                <option>green</option>
+            </select>
+            </td> -->
+
+            <td>
+            <input class="reset" type="reset" value="Reset" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </form>
+</div>

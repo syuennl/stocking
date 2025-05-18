@@ -1,0 +1,80 @@
+{% load static %}
+{% include 'home/material_filter.html' %}
+
+{% if acc_type == 'adminn' %} <!--admin materials section in home page-->
+
+    <div class="material-heading">
+        <h1>Materials</h1>
+        <button id="add-material-btn">+</button>
+    </div>
+
+    <div class="all-materials">
+        {% for material in materials %} 
+        <div class="material-card"> 
+                
+            <a href="{% url 'admin-material' material.id 'adminn' %}"><img src="{{material.picture.url}}" alt="material image"></a>
+            <!--w/o url will direct to img pg, so muz hv-->
+
+            <div class="bottom-row">
+                <div class="description">
+                    <a href="{% url 'admin-material' material.id 'adminn' %}"><h3>{{material.name}}</h3></a>
+                    <span>{{material.created|date:'d-m-Y'}}</span>
+                </div>
+                
+                <div class="manage-material">
+                  <button class="manage-btn">...</button>
+                   
+                  <div class="manage-dropdown">
+                    <a href="{% url 'update-material' material.id %}">
+                      <img src="{% static 'images/edit.png' %}" alt="edit button">
+                    </a>
+                    <a href="{% url 'delete' 'Material' material.id %}">
+                      <img src="{% static 'images/delete.png' %}" alt="delete button">
+                    </a>
+                  </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- {% if request.user == material.user %}
+                          <a href="{% url 'delete' 'Material' material.id %}">delete</a>
+                          {% endif %} -->
+        <!-- <span>by {{material.user}}</span> -->
+        {% endfor %}
+    </div>
+
+{% else %} <!--user materials section in home page-->
+  <!-- <h1 class="user-heading">materials</h1> -->
+  
+  <h1 class="user-material-heading">Materials</h1>
+  <br>
+
+  <div class="all-materials">
+    {% for material in materials %} 
+    <div class="material-card">
+      <a href="{% url 'material' material.id %}"><img src="{{material.picture.url}}" alt="material image"></a>
+
+      <div class="bottom-row">
+        <div class="description">
+          <a href="{% url 'material' material.id %}">
+            <h3>{{material.name}}</h3>
+          </a>
+          <span>{{material.created|date:'d-m-Y'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="material">
+      <div class="user-material-pic">
+        <img src="{{material.picture.url}}" width="80" height="80" />
+      </div>
+
+      <div class="description">
+        <a href="{% url 'material' material.id %}">{{material.name}}</a>
+      </div>
+    </div> -->
+    {% endfor %}
+  </div>
+{% endif %}
+

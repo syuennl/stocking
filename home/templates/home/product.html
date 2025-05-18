@@ -1,0 +1,116 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="view-product-content">
+    <div class="view-product">
+        <!------------------- heading ----------------------->
+        <div class="heading">
+            <h1>{{product.name}}</h1>
+
+            {% if acc_type == 'adminn' %} <!--admin product page-->
+            <div>
+                <!-- {% if request.user == product.user %} -->
+                <a href="{% url 'update-product' product.id %}">edit</a> 
+                <a href="{% url 'delete' 'Product' product.id %}">delete</a>
+                <!-- {% endif %} -->
+            </div>
+            {% endif %}
+        </div>
+
+        <span id="date">updated on {{product.updated|date:'d-m-Y'}}</span> <br><br>
+        
+        <!------------------- product details ----------------------->
+        <div class="details">
+            <div class="product-img">
+                <img src="{{product.picture.url}}" alt="product image" /> <br>
+            </div>
+            
+            <!------------------- admin products description ----------------------->
+            {% if acc_type == 'adminn' %}
+            <div class="product-description">
+                <div class="description-box">
+                    <h3 class="keys">Materials</h3>
+                    <div class="values">
+                        <h3>:</h3>
+                        <div class="product-materials">
+                            {% for productmaterial in product.productmaterial_set.all %}
+                                <a href="{% url 'admin-material' productmaterial.material.id 'adminn' %}">
+                                    {{productmaterial.material.name}} ({{productmaterial.quantity_used}})
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% for key, value in details.items %}
+                    <div class="description-box">
+                        {% if key == 'Stock' %} <!--stock-->
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <input id="stock" type="number" value="{{value}}" min="0" />
+                            </div>
+                        {% elif key == 'Description' %} <!--stock-->
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <textarea name="description" id="description" disabled>{{product.description}}</textarea>      
+                            </div>
+                        {% else %}
+                            <h3 class="keys">{{key}}</h3>
+                            <div class="values">
+                                <h3>:</h3>
+                                <h3>{{value}}</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+    
+            <!------------------- user products description ----------------------->
+            {% else %}
+            <div class="product-description">
+                <div class="description-box">
+                    <h3 class="keys">Materials</h3>
+                    <div class="values">
+                        <h3>:</h3>
+                        <div class="product-materials">
+                            {% for productmaterial in product.productmaterial_set.all %}
+                            <a href="{% url 'admin-material' productmaterial.material.id 'adminn' %}">
+                                {{productmaterial.material.name}} ({{productmaterial.quantity_used}})
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            
+                {% for key, value in user_details.items %}
+                <div class="description-box">
+                    {% if key == 'Stock' %} <!--stock-->
+                    <h3 class="keys">{{key}}</h3>
+                    <div class="values">
+                        <h3>:</h3>
+                        <input id="stock" type="number" value="{{value}}" min="0" />
+                    </div>
+                    {% elif key == 'Description' %} <!--stock-->
+                    <h3 class="keys">{{key}}</h3>
+                    <div class="values">
+                        <h3>:</h3>
+                        <textarea name="description" id="description" disabled>{{product.description}}</textarea>
+                    </div>
+                    {% else %}
+                    <h3 class="keys">{{key}}</h3>
+                    <div class="values">
+                        <h3>:</h3>
+                        <h3>{{value}}</h3>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

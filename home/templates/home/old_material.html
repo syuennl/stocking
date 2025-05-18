@@ -1,0 +1,93 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+<style> /*muz b within block content*/
+    .material-container{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .product-item{
+        display: flex; /*no flex-direction, pic & details aligned side by side*/
+        gap: 20px; /*gap between pic & details*/
+        align-items: center;
+    }
+
+    .product-pic img{
+        width: 80px;
+        height: 80px;
+        object-fit: cover; /*lock pic aspect ratio*/
+    }
+
+</style>
+
+<h1>{{material.name}}</h1>
+
+
+<div class="material-container">
+    
+    {% if acc_type == 'adminn' %} <!--admin materials page-->
+    <div class="admin-material-page">
+        <div>
+            <img src="{{material.picture.url}}" width=150 height=150 alt=""/>
+        </div>
+
+        <a href="{% url 'update-material' material.id %}">edit</a> 
+        <a href="{% url 'delete' 'Material' material.id %}">delete</a>
+        <br>
+        <span>updated {{material.updated|timesince}} ago</span>
+        <ul>
+            {% for key, value in details.items %}
+                {% if key == 'stock' %}
+                    <li>{{key}}: <a href="{% url 'increase' 'material' material.id %}">+</a> {{value}} <a href="{% url 'decrease' 'material' material.id %}">-</a></li>
+                {% else %}
+                    <li>{{key}}: {{value}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <br>
+    </div>
+    {% else %} <!--user materials page-->
+    <div class="user-material-page">
+        <div>
+            <img src="{{material.picture.url}}" width=150 height=150 alt=""/>
+        </div>
+        <div class="user-material">
+            <ul>
+                <li>name: {{material.name}}</li>
+                <li>size: {{material.size}}</li>
+                <li>colour: {{material.colour}}</li>
+                <li>stock: {{material.stock}}</li>
+                <li>category: {{material.category}}</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!--related products-->
+    <div class="related_products-container">
+        <h2>Related products</h2>
+        {% for product in related_products %}
+        <div class="product-item">
+            <div class="product-pic">
+                <img src="{{product.picture.url}}" />
+            </div>
+            
+            <div class="product-details">
+                {% if acc_type == 'adminn' %}
+                    <a href="{% url 'admin-product' product.id 'adminn' %}">{{product.name}}</a>
+                {% else %}
+                    <a href="{% url 'product' product.id %}">{{product.name}}</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+            No related products found.
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}
